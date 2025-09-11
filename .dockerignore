@@ -1,0 +1,10 @@
+# Reduce build context size
+.git
+.gitignore
+node_modules
+vendor
+bundles
+assets/uploads
+npm-debug.log*
+yarn-error.log*
+.DS_Store
