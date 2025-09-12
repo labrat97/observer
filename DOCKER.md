@@ -34,7 +34,7 @@ Then open http://localhost:8080/ in your browser.
 
 ### Optional environment variables
 - **OB_SITE**: public base URL of Observer (include trailing slash)
-- **OB_HASH_SALT**: random string for password hashing; auto-generated default is okay
+- **OB_HASH_SALT**: password pepper for hashing. Auto-generated and persisted on first start at `/var/ob/secrets/hash_salt`. You can override by setting this env var, but do not change it after users exist.
 - **OB_ENABLE_CRON_MONITOR**: run background cron monitor (0/1, default 1)
 - **OB_RUN_UPDATES_ON_STARTUP**: run database updates automatically at boot (0/1, default 1)
 
@@ -68,6 +68,8 @@ docker exec -it observer tools/cli/ob cron run
 ### Persistence
 Bind-mount a host directory to persist app data across restarts/upgrades:
 - `/var/ob` – contains media, thumbnails, cache, and application data
+
+The password hashing pepper is persisted at `/var/ob/secrets/hash_salt`. Keep this file secret and stable. If you are migrating from an older container that used a custom `OB_HASH_SALT`, either set the same value via `-e OB_HASH_SALT=...` on first start or place the value into `/var/ob/secrets/hash_salt` before starting to preserve existing password hashes.
 
 ---
 

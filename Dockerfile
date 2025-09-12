@@ -50,7 +50,6 @@ ENV OB_DB_HOST=localhost \
     OB_DB_NAME=observer \
     OB_DB_USER=observer \
     OB_DB_PASS=observer \
-    OB_HASH_SALT=change_me \
     OB_SITE=http://localhost/ \
     OB_EMAIL_FROM=OpenBroadcaster \
     OB_EMAIL_REPLY=noreply@example.com \

@@ -8,7 +8,6 @@ cd /var/www/html
 : "${OB_DB_NAME:=observer}"
 : "${OB_DB_USER:=observer}"
 : "${OB_DB_PASS:=observer}"
-: "${OB_HASH_SALT:=change_me}"
 : "${OB_SITE:=http://localhost/}"
 : "${OB_EMAIL_FROM:=OpenBroadcaster}"
 : "${OB_EMAIL_REPLY:=noreply@example.com}"
@@ -28,6 +27,28 @@ export OB_MEDIA_UPLOADS OB_MEDIA_ARCHIVE OB_THUMBNAILS OB_CACHE
 # Ensure writable directories exist
 mkdir -p "$OB_MEDIA_BASE" "$OB_MEDIA_UPLOADS" "$OB_MEDIA_ARCHIVE" "$OB_THUMBNAILS" "$OB_CACHE" /var/www/html/assets/uploads
 chown -R www-data:www-data /var/ob /var/www/html/assets/uploads || true
+
+# ---------- Generate and persist OB_HASH_SALT on first run ----------
+# If OB_HASH_SALT is not provided, or left as the insecure default,
+# generate a cryptographically strong random value and persist it under /var/ob.
+SALT_FILE="/var/ob/secrets/hash_salt"
+if [[ -z "${OB_HASH_SALT:-}" || "${OB_HASH_SALT}" == "change_me" ]]; then
+  mkdir -p "$(dirname "$SALT_FILE")"
+  if [[ -f "$SALT_FILE" && -s "$SALT_FILE" ]]; then
+    OB_HASH_SALT="$(cat "$SALT_FILE")"
+    # Ensure readable by web server user
+    chown www-data:www-data "$SALT_FILE" || true
+    chmod 600 "$SALT_FILE" || true
+  else
+    umask 077
+    # 48 random bytes, base64-encoded (~64 chars)
+    OB_HASH_SALT="$(head -c 48 /dev/urandom | base64)"
+    printf '%s' "$OB_HASH_SALT" > "$SALT_FILE"
+    chown www-data:www-data "$SALT_FILE" || true
+    chmod 600 "$SALT_FILE" || true
+  fi
+  export OB_HASH_SALT
+fi
 
 # ---------- Embedded MariaDB server ----------
 MYSQLD_BIN="$(command -v mariadbd || true)"; [[ -n "$MYSQLD_BIN" ]] || MYSQLD_BIN="$(command -v mysqld || true)"
@@ -96,7 +117,15 @@ define('OB_DB_PASS', getenv('OB_DB_PASS') ?: 'observer');
 define('OB_DB_HOST', getenv('OB_DB_HOST') ?: '127.0.0.1');
 define('OB_DB_NAME', getenv('OB_DB_NAME') ?: 'observer');
 
-define('OB_HASH_SALT', getenv('OB_HASH_SALT') ?: 'change_me');
+// Resolve OB_HASH_SALT from env; fallback to persisted secret file if needed
+$__salt = getenv('OB_HASH_SALT') ?: '';
+if ($__salt === '') {
+    $__salt_file = '/var/ob/secrets/hash_salt';
+    if (is_readable($__salt_file)) {
+        $__salt = trim(file_get_contents($__salt_file));
+    }
+}
+define('OB_HASH_SALT', $__salt);
 
 define('OB_MEDIA', getenv('OB_MEDIA') ?: '/var/ob/media');
 define('OB_MEDIA_UPLOADS', getenv('OB_MEDIA_UPLOADS') ?: getenv('OB_MEDIA').'/uploads');
