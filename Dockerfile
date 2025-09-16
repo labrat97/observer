@@ -64,6 +64,14 @@ ENV OB_DB_HOST=localhost \
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Normalize line endings for critical scripts to avoid bash\r issues on Windows checkouts
+RUN set -eux; \
+    sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh; \
+    if [ -f tools/cli/ob ]; then sed -i 's/\r$//' tools/cli/ob; fi; \
+    if [ -f tools/stream/transcode.sh ]; then sed -i 's/\r$//' tools/stream/transcode.sh; fi; \
+    if [ -f dev/pre-commit ]; then sed -i 's/\r$//' dev/pre-commit; fi; \
+    if [ -f tools/git-hooks/pre-commit ]; then sed -i 's/\r$//' tools/git-hooks/pre-commit; fi
+
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

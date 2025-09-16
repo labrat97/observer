@@ -1,0 +1,20 @@
+# Enforce LF endings for shell scripts, Docker files, and PHP/CLI scripts
+* text=auto eol=lf
+
+# Shell scripts and executables
+*.sh     text eol=lf
+*.bash   text eol=lf
+*/bin/*  text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
+
+dev/pre-commit text eol=lf
+/tools/git-hooks/pre-commit text eol=lf
+/tools/cli/ob text eol=lf
+/tools/stream/transcode.sh text eol=lf
+/docker/entrypoint.sh text eol=lf
+
+# PHP CLI entry scripts
+*.php text eol=lf
