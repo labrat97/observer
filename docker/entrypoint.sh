@@ -144,6 +144,20 @@ define('OB_SITE', rtrim(getenv('OB_SITE') ?: 'http://localhost/', '/').'/');
 
 define('OB_EMAIL_REPLY', getenv('OB_EMAIL_REPLY') ?: 'noreply@example.com');
 define('OB_EMAIL_FROM', getenv('OB_EMAIL_FROM') ?: 'OpenBroadcaster');
+
+// Optional SMTP settings pulled from environment
+$__smtp_host = getenv('OB_EMAIL_HOST') ?: null;
+$__smtp_user = getenv('OB_EMAIL_USER') ?: null;
+$__smtp_pass = getenv('OB_EMAIL_PASS') ?: null;
+$__smtp_type = getenv('OB_EMAIL_TYPE') ?: null; // e.g. 'tls' or 'ssl'
+$__smtp_port = getenv('OB_EMAIL_PORT') ?: null; // e.g. 587 or 465
+if ($__smtp_host && $__smtp_user && $__smtp_pass && $__smtp_type && $__smtp_port) {
+    define('OB_EMAIL_HOST', $__smtp_host);
+    define('OB_EMAIL_USER', $__smtp_user);
+    define('OB_EMAIL_PASS', $__smtp_pass);
+    define('OB_EMAIL_TYPE', $__smtp_type);
+    define('OB_EMAIL_PORT', (int)$__smtp_port);
+}
 PHP
   chown www-data:www-data config.php || true
 fi
