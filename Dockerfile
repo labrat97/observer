@@ -46,7 +46,8 @@ RUN chmod +x tools/cli/ob && chown -R www-data:www-data /var/www/html
 VOLUME ["/var/ob"]
 
 # Reasonable defaults; no DB configuration required by user
-ENV OB_DB_HOST=localhost \
+# Use 127.0.0.1 to force TCP and avoid mysqli socket pitfalls
+ENV OB_DB_HOST=127.0.0.1 \
     OB_DB_NAME=observer \
     OB_DB_USER=observer \
     OB_DB_PASS=observer \

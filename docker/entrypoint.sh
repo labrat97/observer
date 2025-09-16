@@ -20,6 +20,12 @@ cd /var/www/html
 : "${OB_RUN_UPDATES_ON_STARTUP:=1}"
 : "${OB_FORCE_CONFIG_REGENERATE:=0}"
 
+# Normalize DB host: 'localhost' forces mysqli to use a Unix socket; prefer TCP
+if [[ "${OB_DB_HOST}" == "localhost" ]]; then
+  echo "OB_DB_HOST=localhost detected; normalizing to 127.0.0.1 for TCP"
+  export OB_DB_HOST="127.0.0.1"
+fi
+
 # Export derived paths for config getenv() usage
 export OB_MEDIA="$OB_MEDIA_BASE"
 export OB_MEDIA_UPLOADS OB_MEDIA_ARCHIVE OB_THUMBNAILS OB_CACHE
