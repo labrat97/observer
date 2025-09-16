@@ -31,6 +31,7 @@ class OBFDB
     private $hl_offset;
     private $hl_leftjoin;
     private $hl_foundrows;
+    private $hl_table; // ensure defined to avoid dynamic property deprecation on PHP 8.2+
 
     private $hl_where_mode = 'AND';
 
