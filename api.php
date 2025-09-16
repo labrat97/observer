@@ -1,5 +1,9 @@
 <?php
 
+// Ensure clean JSON output: buffer any incidental output (warnings/notices)
+// so we can discard it before emitting the API response.
+ob_start();
+
 // Copyright 2012-2025 OpenBroadcaster, Inc.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 

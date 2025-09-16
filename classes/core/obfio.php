@@ -97,6 +97,14 @@ class OBFIO
      */
     public function output($data)
     {
+        // Always return JSON
+        header('Content-Type: application/json');
+
+        // Discard any buffered incidental output (warnings/notices) to keep JSON intact
+        if (ob_get_level() > 0) {
+            ob_clean();
+        }
+
         echo json_encode($data);
     }
 }
